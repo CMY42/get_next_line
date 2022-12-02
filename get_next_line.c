@@ -6,182 +6,123 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 15:57:06 by cmansey           #+#    #+#             */
-/*   Updated: 2022/11/24 16:07:29 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/02 17:09:15 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
+//METTRE DE COTE CE QUI EST LU DANS LE BUFFER DE READ
+//TANT QUE PAS DE RETOUR A LA LIGNE
+//GARDER CE QU ON A LU ET METTRE DANS STATIC
+char	*ft_read_str(int fd, char *str)
 {
-	size_t	i;
+	char		*buf;
+	int			i;
 
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	i;
-	char	*fin;
-
-	i = 0;
-	if (!s1 || !s2)
+	buf = malloc(BUFFER_SIZE + 1);
+	if (!buf)
 		return (NULL);
-	fin = (char *)malloc((ft_strlen (s1) + ft_strlen (s2) +1));
-	if (!fin)
-		return (NULL);
-	while (*s1)
+	i = 1;
+	while (!ft_strchr(str, '\n') && i > 0)
 	{
-		fin[i] = *s1;
-		s1++;
-		i++;
+		i = read(fd, buf, BUFFER_SIZE);
+		if (i == -1)
+		{
+			free(str);
+			free(buf);
+			return (NULL);
+		}
+		buf[i] = '\0';
+		str = ft_strjoin(str, buf);
 	}
-	while (*s2)
-	{
-		fin[i] = *s2;
-		s2++;
-		i++;
-	}
-	fin[i] = '\0';
-	return (fin);
+	free(buf);
+	return (str);
 }
 
-char	*ft_strchr(char *s, int c)
-{
-	while (*s)
-	{
-		if (*s == (char)c)
-			return ((char *)s);
-			s++;
-	}
-	if (*s == (char)c)
-		return ((char *)s);
-	if (c == 0)
-		return ((char *)s);
-	return (NULL);
-}
-
-char	*ft_select(char *buf, char ret)
+//SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
+//RETOUR A LA LIGNE DANS LINE
+char	*ft_get_line(char *str)
 {
 	int		i;
-	char	*dest;
+	char	*new_str;
 
 	i = 0;
-	while (buf && buf[i] && buf[i] != '\n')
-		i++;
-	dest = malloc(i + 1);
-	if (!dest)
+	if (!*str)
 		return (NULL);
-	if (ft_strchr(buf, '\n') != 0)
-		ret = 1;
+	while (str[i] && str[i] != '\n')
+		i++;
+	new_str = malloc(i + 2);
+	if (!new_str)
+		return (NULL);
 	i = 0;
-	while (buf && buf[i] && buf[i] != '\n')
+	while (str[i] && str[i] != '\n')
 	{
-		dest [i] = buf[i];
+		new_str[i] = str[i];
 		i++;
 	}
-	dest[i] = 0;
-	return (dest);
+	if (str[i] == '\n')
+	{
+		new_str[i] = str[i];
+		i++;
+	}
+	new_str[i] = '\0';
+	return (new_str);
 }
 
-char	*ft_select2(char *buf)
+char	*ft_select_str(char *str)
 {
 	int		i;
 	int		j;
-	char	*dest;
+	char	*new_str;
 
 	i = 0;
-	while (buf && buf[i] && buf[i] != '\n')
+	while (str[i] && str[i] != '\n')
 		i++;
-		dest = malloc(ft_strlen(buf) - i + 1);
-	if (!dest)
+	if (!str[i])
+	{
+		free(str);
 		return (NULL);
+	}
+	new_str = malloc(ft_strlen(str) - i + 1);
+	if (!new_str)
+		return (NULL);
+	i++;
 	j = 0;
-	while (buf && buf[i])
-		dest[j++] = buf[++i];
-	dest[j] = 0;
-	return (dest);
+	while (str[i])
+		new_str[j++] = str[i++];
+	new_str[j] = '\0';
+	free(str);
+	return (new_str);
 }
 
 char	*get_next_line(int fd)
 {
-	char		buf[BUFFER_SIZE + 1];
-	char		*ret;
-	static char	*str;
-	char		*tmp;
 	char		*line;
+	static char	*str;
 
-	ret = BUFFER_SIZE;
-	line = NULL;
-	if (fd < 0 || fd > 1023 || !line || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 1023 || BUFFER_SIZE <= 0)
 		return (NULL);
-	while (*ret > 0)
-	{
-		*ret = read(fd, buf, BUFFER_SIZE);
-		if (*ret < 0)
-			return (NULL);
-		buf[*ret] = 0;
-		tmp = str;
-		str = ft_strjoin(tmp, buf);
-		free(tmp);
-		if (ft_strchr(str, '\n'))
-			break ;
-	}
-	line = ft_select(str, *ret);
-	tmp = str;
-	str = ft_select2(tmp);
-	free(tmp);
-	if (*ret == 0 && (*str) == 0)
-	{
-		free(str);
-		str = NULL;
-	}
-	return (&*ret);
-}
-
-/*LIRE LE FICHIER
-ssize_t	read(int fildes, void *buf, size_t nbyte);
-{
-
-}
-
-//METTRE DE COTE CE QUI EST LU DANS LE BUFFER DE READ
-void	stock_line(void)
-{
-	char	*buf;
-
-	buf = malloc(BUFFER_SIZE +1);
-	if (buf == NULL)
+	str = ft_read_str(fd, str);
+	if (!str)
 		return (NULL);
-	while (new_line())
-	{
-
-	}
+	line = ft_get_line(str);
+	str = ft_select_str(str);
+	return (line);
 }
 
-SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
+/*SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
 
 CARACTERE ET RETOUR A LA LIGNE DANS LINE
 
 ENSUITE ON NETTOYE CE QUI SE TROUVE DANS LA STASH
 
 ON VEUT GARDER CE QUON A DEJA LU DONC STATIC
-*/
+
 int	main()
 {
 	int		fd;
-	char	*line;
 
-	fd = open("test1", O_RDONLY);
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		printf("%s", line);
-		free(line);
-	}
-}
+	fd = open("test.fd", O_RDONLY);
+	printf("%ret", get_next_line(fd));
+}*/
