@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 15:57:32 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/02 16:50:16 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/06 13:45:30 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ char	*ft_strjoin(char *str, char *buf)
 		str = malloc(sizeof (char));
 		str[0] = '\0';
 	}
-	if (!str || !buf)
+	if (!buf)
 		return (NULL);
 	new_str = malloc((ft_strlen(str) + ft_strlen(buf)) + 1);
 	if (!new_str)
