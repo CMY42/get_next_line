@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/21 15:57:06 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/06 11:55:40 by cmansey          ###   ########.fr       */
+/*   Created: 2022/12/06 10:45:23 by cmansey           #+#    #+#             */
+/*   Updated: 2022/12/06 11:54:59 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 //METTRE DE COTE CE QUI EST LU DANS LE BUFFER DE READ
 //TANT QUE PAS DE RETOUR A LA LIGNE
@@ -100,34 +100,14 @@ char	*ft_select_str(char *str)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*str;
+	static char	*str[FD_SETSIZE];
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 4096 || BUFFER_SIZE <= 0)
 		return (NULL);
-	str = ft_read_str(fd, str);
-	if (!str)
+	str[fd] = ft_read_str(fd, str[fd]);
+	if (!str[fd])
 		return (NULL);
-	line = ft_get_line(str);
-	str = ft_select_str(str);
+	line = ft_get_line(str[fd]);
+	str[fd] = ft_select_str(str[fd]);
 	return (line);
 }
-
-/*SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
-
-CARACTERE ET RETOUR A LA LIGNE DANS LINE
-
-ENSUITE ON NETTOYE CE QUI SE TROUVE DANS LA STASH
-
-ON VEUT GARDER CE QUON A DEJA LU DONC STATIC
-
-int	main()
-{
-	int		fd;
-
-	fd = open("test.fd", O_RDONLY);
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-}*/
