@@ -6,15 +6,15 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 15:57:06 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/06 13:45:32 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/07 18:01:55 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 //METTRE DE COTE CE QUI EST LU DANS LE BUFFER DE READ
-//TANT QUE PAS DE RETOUR A LA LIGNE
-//GARDER CE QU ON A LU ET METTRE DANS STATIC
+//QUAND UN RETOUR A LA LIGNE APPARAIT ON STOCK DANS STATIC
+//PROBLEME LE CURSEUR DE READ PEUT SE TROUVER APRES LE \N
 char	*ft_read_str(int fd, char *str)
 {
 	char		*buf;
@@ -40,38 +40,40 @@ char	*ft_read_str(int fd, char *str)
 	return (str);
 }
 
-//SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
-//RETOUR A LA LIGNE DANS LINE
+//SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STR ON EXTRAIT
+//JUSQUE AU RETOUR A LA LIGNE DANS LINE
 char	*ft_get_line(char *str)
 {
 	int		i;
-	char	*new_str;
+	char	*line;
 
 	i = 0;
 	if (!*str)
 		return (NULL);
 	while (str[i] && str[i] != '\n')
 		i++;
-	new_str = malloc(i + 2);
-	if (!new_str)
+	line = malloc(i + 2);
+	if (!line)
 		return (NULL);
 	i = 0;
 	while (str[i] && str[i] != '\n')
 	{
-		new_str[i] = str[i];
+		line[i] = str[i];
 		i++;
 	}
 	if (str[i] == '\n')
 	{
-		new_str[i] = str[i];
+		line[i] = str[i];
 		i++;
 	}
-	new_str[i] = '\0';
-	return (new_str);
+	line[i] = '\0';
+	return (line);
 }
 
-//ENSUITE ON NETTOYE CE QUI SE TROUVE DANS LA STASH
-char	*ft_select_str(char *str)
+//ON VA STOCKER CE QUI SE TROUVE APRES LE \N
+//DANS STATIC
+//POUR LA PROCHAINE FOIS OU ON APPEL GNL
+char	*ft_str_next_time(char *str)
 {
 	int		i;
 	int		j;
@@ -85,7 +87,7 @@ char	*ft_select_str(char *str)
 		free(str);
 		return (NULL);
 	}
-	new_str = malloc(ft_strlen(str) - i + 1);
+	new_str = malloc(ft_strlen(str) - i);
 	if (!new_str)
 		return (NULL);
 	i++;
@@ -108,19 +110,12 @@ char	*get_next_line(int fd)
 	if (!str)
 		return (NULL);
 	line = ft_get_line(str);
-	str = ft_select_str(str);
+	str = ft_str_next_time(str);
 	return (line);
+	free(str);
 }
 
-/*SI RETOUR A LA LIGNE APPARAIT DANS NOTRE STASH ON EXTRAIT
-
-CARACTERE ET RETOUR A LA LIGNE DANS LINE
-
-ENSUITE ON NETTOYE CE QUI SE TROUVE DANS LA STASH
-
-ON VEUT GARDER CE QUON A DEJA LU DONC STATIC
-
-int	main()
+/*int	main(void)
 {
 	int		fd;
 
@@ -130,4 +125,5 @@ int	main()
 	printf("%s", get_next_line(fd));
 	printf("%s", get_next_line(fd));
 	printf("%s", get_next_line(fd));
+	printf("%d", BUFFER_SIZE);
 }*/
