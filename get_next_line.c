@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 15:57:06 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/08 13:44:08 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/08 13:47:51 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,6 @@ char	*get_next_line(int fd)
 	line = ft_get_line(str);
 	str = ft_str_next_time(str);
 	return (line);
-	free(str);
 }
 
 /*int	main(void)
