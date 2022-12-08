@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/06 10:45:23 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/06 12:01:14 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/08 13:44:00 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ char	*ft_select_str(char *str)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*str[FD_SETSIZE];
+	static char	*str[4096];
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
