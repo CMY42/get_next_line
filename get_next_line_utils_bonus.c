@@ -6,11 +6,11 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/06 10:45:27 by cmansey           #+#    #+#             */
-/*   Updated: 2022/12/06 12:01:16 by cmansey          ###   ########.fr       */
+/*   Updated: 2022/12/12 13:42:55 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_strchr(char *s, int c)
 {
